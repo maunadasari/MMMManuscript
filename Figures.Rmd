@@ -13,7 +13,7 @@ theme_set(theme_minimal())
 
 # Fig1: Scholarly Literature
 ## A Battle Citations By Year
-```{r fig.height=5,fig.width=7}
+```{r}
 df_1A<-read.csv("Data/Fig1/NumberCitationsYear.csv")
 df_1A[is.na(df_1A)]<-0
 colnames(df_1A)<-c("Year","Battle Narration", "Genetics")
@@ -30,10 +30,8 @@ plot1A<-ggplot(df_1A,aes(x=as.factor(Year),y=citations))+
     labs(tag = "A")+
     theme(legend.position = "bottom",
           legend.title = element_blank(),
-          axis.title.x = element_text(color="black",
-                                      size=14),
-          axis.title.y = element_text(color="black",
-                                      size=14),
+          axis.text = element_text(size=10),
+          axis.title = element_text(size=13),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(),
           axis.line.x = element_line(size=.4),
@@ -41,7 +39,7 @@ plot1A<-ggplot(df_1A,aes(x=as.factor(Year),y=citations))+
 ```
 
 ## B Battle Narration Top 25 Cited Journals
-```{r fig.height=9,fig.width=15}
+```{r}
 df_1B<-read.csv("Data/Fig1/CitationsByJournal.csv",stringsAsFactors = T)
 colnames(df_1B)<-c("Publication","Citations")
 jlevel<-levels(df_1B$Publication)
@@ -51,9 +49,9 @@ plot1B<-ggplot(df_1B,aes(x=fct_reorder(Publication,Citations),y=Citations))+
     ylab("Number of Citations")+
     coord_flip()+
     labs(tag = "B")+
-    theme(axis.text.x = element_text(size=14),
-          axis.text.y = element_text(size=14),
-          axis.title.x = element_text(size=16),
+    theme(axis.text.x = element_text(size=10),
+          axis.text.y = element_text(size=10),
+          axis.title.x = element_text(size=13),
           axis.title.y = element_blank(),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(),
@@ -70,12 +68,16 @@ plot1C<-ggplot(aes(x=Year,y=Citations),
                data=df_1C)+
     geom_col(fill="#029597",color="#006466",width = 1)+
     ylab("Number of Citations")+
-    xlab("Year")+
+    #xlab("Year")+
     scale_x_continuous(breaks = pretty_breaks(n=12),expand = c(0,0))+
     scale_y_continuous(breaks = pretty_breaks(n=10),expand = c(0,0),position = "right")+labs(tag="C")+
     theme(axis.text.x = element_text(angle = 90,
                                      vjust = 0.5, 
-                                     hjust=1),
+                                     hjust=1,
+                                     size=10),
+          axis.text.y = element_text(size=10),
+          axis.title = element_text(size=13),
+          #axis.title.x = element_blank(),
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4),
           panel.grid.major = element_blank(), 
