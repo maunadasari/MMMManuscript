@@ -7,21 +7,83 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse);library(gridExtra)
+library(tidyverse);library(gridExtra);library(scales)
+theme_set(theme_minimal())
 ```
 
 # Fig1: Scholarly Literature
-## A 
-```{r cars}
-summary(cars)
+## A Battle Citations By Year
+```{r fig.height=5,fig.width=7}
+df_1A<-read.csv("Data/Fig1/NumberCitationsYear.csv")
+df_1A[is.na(df_1A)]<-0
+colnames(df_1A)<-c("Year","Battle Narration", "Genetics")
+df_1A<-df_1A %>% pivot_longer(-Year,names_to = "Type",values_to = "citations")
+df_1A$Type<-factor(df_1A$Type,
+                    levels = c("Genetics","Battle Narration"))
+
+plot1A<-ggplot(df_1A,aes(x=as.factor(Year),y=citations))+
+    geom_col(aes(fill=Type),color="black")+
+    xlab("Year")+ylab("Number of Scholarly Citations")+
+    scale_y_continuous(breaks = seq(0, 500, by = 50),
+                       expand = c(0,0))+
+    scale_fill_manual(values=c("#7B287B","#3C557C"))+
+    labs(tag = "A")+
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          axis.title.x = element_text(color="black",
+                                      size=14),
+          axis.title.y = element_text(color="black",
+                                      size=14),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4));plot1A
 ```
 
-## Including Plots
+## B Battle Narration Top 25 Cited Journals
+```{r fig.height=9,fig.width=15}
+df_1B<-read.csv("Data/Fig1/CitationsByJournal.csv",stringsAsFactors = T)
+colnames(df_1B)<-c("Publication","Citations")
+jlevel<-levels(df_1B$Publication)
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+plot1B<-ggplot(df_1B,aes(x=fct_reorder(Publication,Citations),y=Citations))+
+    geom_col(fill="#206E83",color="black")+
+    ylab("Number of Citations")+
+    coord_flip()+
+    labs(tag = "B")+
+    theme(axis.text.x = element_text(size=14),
+          axis.text.y = element_text(size=14),
+          axis.title.x = element_text(size=16),
+          axis.title.y = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4));plot1B
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## C Publication Year of Citations
+```{r}
+df_1C<-read.csv("Data/Fig1/CitationsYears.csv")
+colnames(df_1C)<-c("Year","Citations")
+
+plot1C<-ggplot(aes(x=Year,y=Citations),
+               data=df_1C)+
+    geom_col(fill="#029597",color="#006466",width = 1)+
+    ylab("Number of Citations")+
+    xlab("Year")+
+    scale_x_continuous(breaks = pretty_breaks(n=12),expand = c(0,0))+
+    scale_y_continuous(breaks = pretty_breaks(n=10),expand = c(0,0),position = "right")+labs(tag="C")+
+    theme(axis.text.x = element_text(angle = 90,
+                                     vjust = 0.5, 
+                                     hjust=1),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank());plot1C
+```
+
+## Combo
+```{r}
+
+```
+
