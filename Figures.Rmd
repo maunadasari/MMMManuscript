@@ -11,23 +11,23 @@ library(tidyverse);library(gridExtra);library(scales)
 theme_set(theme_minimal())
 ```
 
-# Fig1: Scholarly Literature
+# Fig1: Scholarly Literature {.tabset}
 ## A Battle Citations By Year
 ```{r}
-df_1A<-read.csv("Data/Fig1/NumberCitationsYear.csv")
-df_1A[is.na(df_1A)]<-0
-colnames(df_1A)<-c("Year","Battle Narration", "Genetics")
-df_1A<-df_1A %>% pivot_longer(-Year,names_to = "Type",values_to = "citations")
-df_1A$Type<-factor(df_1A$Type,
+df1A<-read.csv("Data/Fig1/NumberCitationsYear.csv")
+df1A[is.na(df1A)]<-0
+colnames(df1A)<-c("Year","Battle Narration", "Genetics")
+df1A<-df1A %>% pivot_longer(-Year,names_to = "Type",values_to = "citations")
+df1A$Type<-factor(df1A$Type,
                     levels = c("Genetics","Battle Narration"))
 
-plot1A<-ggplot(df_1A,aes(x=as.factor(Year),y=citations))+
+plot1A<-ggplot(df1A,aes(x=as.factor(Year),y=citations))+
     geom_col(aes(fill=Type),color="black")+
     xlab("Year")+ylab("Number of Citations")+
     scale_y_continuous(breaks = seq(0, 500, by = 50),
                        expand = c(0,0))+
     scale_fill_manual(values=c("#7B287B","#3C557C"))+
-    labs(tag = "A", title="Battle Citations by Year")+
+    labs(title="A. Battle Citations by Year")+
     theme(plot.title = element_text(hjust = 0.5,size=16),
           legend.position = c(.2,.8),
           legend.title = element_blank(),
@@ -41,16 +41,16 @@ plot1A<-ggplot(df_1A,aes(x=as.factor(Year),y=citations))+
 
 ## B Battle Narration Top 25 Cited Journals
 ```{r}
-df_1B<-read.csv("Data/Fig1/CitationsByJournal.csv",stringsAsFactors = T)
-colnames(df_1B)<-c("Publication","Citations")
-jlevel<-levels(df_1B$Publication)
+df1B<-read.csv("Data/Fig1/CitationsByJournal.csv",stringsAsFactors = T)
+colnames(df1B)<-c("Publication","Citations")
+jlevel<-levels(df1B$Publication)
 
-plot1B<-ggplot(df_1B,aes(x=fct_reorder(Publication,Citations),y=Citations))+
-    geom_col(fill="#206E83",color="black")+
+plot1B<-ggplot(df1B,aes(x=fct_reorder(Publication,Citations),y=Citations))+
+    geom_col(fill="#3C557C",color="#212F45",width = 1)+ #teal: 206E83
     ylab("Number of Citations")+
     coord_flip()+
-    labs(tag = "B", title="Top 25 Journals Cited in Narrations")+
-    theme(plot.title = element_text(hjust = 0.5,size=16),
+    labs(title="B. Top 25 Journals Cited in Narrations")+
+    theme(plot.title = element_text(hjust = .5,size=16),
           axis.text.y = element_text(size=10),
           axis.title.x = element_text(size=13),
           axis.title.y = element_blank(),
@@ -62,23 +62,24 @@ plot1B<-ggplot(df_1B,aes(x=fct_reorder(Publication,Citations),y=Citations))+
 
 ## C Publication Year of Citations
 ```{r}
-df_1C<-read.csv("Data/Fig1/CitationsYears.csv")
-colnames(df_1C)<-c("Year","Citations")
+df1C<-read.csv("Data/Fig1/CitationsYears.csv")
+colnames(df1C)<-c("Year","Citations")
 
 plot1C<-ggplot(aes(x=Year,y=Citations),
-               data=df_1C)+
-    geom_col(fill="#029597",color="#006466",width = 1)+
+               data=df1C)+
+    geom_col(fill="#3C557C",color="#212F45",width = 1)+ #lighter teal 029597
     ylab("Number of Citations")+
     #xlab("Year")+
     scale_x_continuous(breaks = pretty_breaks(n=12),expand = c(0,0))+
-    scale_y_continuous(breaks = pretty_breaks(n=10),expand = c(0,0),position = "left")+labs(tag="C")+
+    scale_y_continuous(breaks = pretty_breaks(n=10),expand = c(0,0),position = "left")+
+    labs(title="C. Publication Year of Citations Used in Narrations")+
     theme(axis.text.x = element_text(angle = 90,
                                      vjust = 0.5, 
                                      hjust=1,
                                      size=10),
           axis.text.y = element_text(size=10),
           axis.title = element_text(size=13),
-          #axis.title.x = element_blank(),
+          plot.title = element_text(hjust = .5,size=16),
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4),
           panel.grid.major = element_blank(), 
@@ -93,3 +94,144 @@ patchedfig1
 ggsave("FullPlots/Fig1Citations.png", width=15,height=7,dpi=300)
 ```
 
+# Fig2: Species Representation
+```{r}
+fig2colors<-read.csv("Data/Fig2.csv") %>% select(Class,HexCode)
+
+df2<-read.csv("Data/Fig2.csv") %>% 
+    select(Class,Class.Representation,March.Mammal.Madness) %>% 
+    rename("Mammalian Class" = Class.Representation,
+           "March Mammal Madness" = March.Mammal.Madness) %>% 
+    pivot_longer(-Class,names_to="Category",values_to = "Represented") %>% left_join(fig2colors,by="Class")
+
+sorted<-df2 %>% 
+    filter(Category=="Mammalian Class") %>% 
+    arrange((Represented)) %>% 
+    pull(Class)
+sorted_colors<-df2 %>% 
+    filter(Category=="Mammalian Class") %>% 
+    arrange(desc(Represented)) %>% 
+    pull(HexCode)
+df2$Class<-factor(as.character(df2$Class),levels=sorted)
+df2$HexCode<-factor(as.character(df2$HexCode),levels=as.character(sorted_colors))
+df2$HexCode<-fct_rev(df2$HexCode)
+
+plot2<-ggplot(df2,aes(x=Category,y=Represented,fill=Class))+
+    geom_bar(stat="identity",color="black")+
+    scale_fill_manual(name="Class",values=as.character(df2$HexCode));plot2
+```
+
+# Fig3: Outcome Proportions
+```{r}
+df3<-read.csv("Data/Fig3.csv")
+colnames(df3)[1]<-"Outcome"
+
+df3<-df3 %>% 
+    pivot_longer(-Outcome,names_to = "Year",values_to = "Percent") 
+df3$Year<-gsub("X","",as.character(df3$Year))
+df3$Outcome<-factor(df3$Outcome,levels=c("Other","Deus ex Machina","Withdrawal","TKO"))
+
+plot3<-ggplot(df3,aes(x=Year,y=Percent,fill=Outcome))+
+    geom_bar(stat="identity",color="black")+
+    scale_fill_manual(values=c("#5d987b","#3d405b","#f2cc8f","#ce4b27"))+
+    #scale_x_discrete(expand = c(0,0))+
+    scale_y_discrete(limits=c(seq(0,100,10)),
+                     expand = c(0,0))+
+    labs(title="Battle Outcome by Tournament Year")+
+    ylab("Percentage")+
+    theme(legend.position="bottom",
+          legend.title = element_blank(),
+          axis.text.x = element_text(size=10),
+          axis.text.y = element_text(size=10),
+          axis.title.y = element_text(size=13),
+          axis.title.x = element_blank(),
+          plot.title = element_text(hjust = .5,size=16),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank());plot3
+
+ggsave("FullPlots/Fig3Outcomes.png", width=7,height=5,dpi=300)
+```
+
+# Fig5: Student Reach
+## A Regional Reach
+```{r}
+df5A<-read.csv("Data/Fig5A.csv")
+colnames(df5A)<-c("Region","US K-12 Public School Population","US K-12 Students Engaged in Mammal March Madness")
+
+df5A<-df5A %>% 
+    pivot_longer(-Region,names_to = "Category",values_to = "Percent")
+df5A$Region<-factor(df5A$Region,levels=c("Pacific","Northeast & Mid-Atlantic","Great Lakes","Mountain West & Midwest Plains","South Central","South Atlantic"))
+
+plot5A<-ggplot(df5A,aes(x=Category,y=Percent,fill=Region,label=Percent))+
+    geom_bar(stat="identity",color="black")+
+    geom_text(size = 3, position = position_stack(vjust = 0.5))+
+    scale_fill_manual(values=c("#90be6d","#43aa8b","#577590","#f9c74f","#f3722c","#f94144"))+
+    #scale_x_discrete(expand = c(0,0))+
+    scale_x_discrete(labels = function(Category) str_wrap(Category, width = 20))+
+    scale_y_discrete(limits=c(seq(0,100,10)),
+                     expand = c(0,0))+
+    labs(title="A. Student Population Distribution: Geographic Regions")+
+    ylab("Percentage")+
+    theme(legend.position="right",
+          legend.title = element_blank(),
+          axis.text.x = element_text(size=10),
+          axis.text.y = element_text(size=10),
+          axis.title.y = element_text(size=13),
+          axis.title.x = element_blank(),
+          plot.title = element_text(hjust = .25,size=16),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank());plot5A
+
+ggsave("FullPlots/Fig5A.png",dpi=300)
+```
+
+## B Region Type
+```{r}
+df5B<-read.csv("Data/Fig5B.csv")
+colnames(df5B)<-c("Region","US K-12 Public School Population","US K-12 Students Engaged in Mammal March Madness")
+
+df5B<-df5B %>% 
+    pivot_longer(-Region,names_to = "Category",values_to = "Percent")
+df5B$Region<-factor(df5B$Region,levels=c("Urban","Suburban","Rural"))
+
+plot5B<-ggplot(df5B,aes(x=Category,y=Percent,fill=Region,label=Percent))+
+    geom_bar(stat="identity",color="black")+
+    geom_text(size = 3, position = position_stack(vjust = 0.5))+
+    scale_fill_manual(values=c("#8DB38B","#56876d","#04724d"))+
+    #scale_x_discrete(expand = c(0,0))+
+    scale_x_discrete(labels = function(Category) str_wrap(Category, width = 20))+
+    scale_y_discrete(limits=c(seq(0,100,10)),
+                     expand = c(0,0))+
+    labs(title="B. Student Population Distribution: Rural, Suburban, and Urban")+
+    ylab("Percentage")+
+    theme(legend.position="right",
+          legend.title = element_blank(),
+          axis.text.x = element_text(size=10),
+          axis.text.y = element_text(size=10),
+          axis.title.y = element_text(size=13),
+          axis.title.x = element_blank(),
+          plot.title = element_text(hjust = .25,size=16),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank());plot5B
+ggsave("FullPlots/Fig5B.png", dpi=300)
+```
+
+## Combo
+```{r eval=F}
+library(magick);library(ggpubr)
+map <- image_read('FullPlots/MapChart_Map.png')
+twitter <- ggplot() +
+  background_image(map) 
+twitter
+
+library(patchwork)
+patchedfig5<-((plot5A / twitter ) | plot5B) + plot_layout(guides = 'keep')#+plot_annotation(tag_levels = 'A')
+patchedfig5
+ggsave("FullPlots/Fig1Citations.png", width=15,height=7,dpi=300)
+```
