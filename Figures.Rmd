@@ -127,29 +127,29 @@ df3<-read.csv("Data/Fig3.csv")
 colnames(df3)[1]<-"Outcome"
 
 df3<-df3 %>% 
-    pivot_longer(-Outcome,names_to = "Year",values_to = "Percent") 
+    pivot_longer(-Outcome,names_to = "Year",values_to = "Percent") %>% 
+  mutate(Percent=Percent/100)
 df3$Year<-gsub("X","",as.character(df3$Year))
 df3$Outcome<-factor(df3$Outcome,levels=c("Other","Deus ex Machina","Withdrawal","TKO"))
 
 plot3<-ggplot(df3,aes(x=Year,y=Percent,fill=Outcome))+
     geom_bar(stat="identity",color="black")+
-    scale_fill_manual(values=c("#5d987b","#3d405b","#f2cc8f","#ce4b27"))+
+    scale_fill_manual(values=c("#90BE6D","#577590","#F9C74F","#F94144"))+
     #scale_x_discrete(expand = c(0,0))+
-    scale_y_discrete(limits=c(seq(0,100,10)),
-                     expand = c(0,0))+
-    labs(title="Battle Outcome by Tournament Year")+
-    ylab("Percentage")+
+    scale_y_continuous(expand = c(0,0),labels = scales::percent)+
+    labs(title="Battle Outcomes by Tournament Year")+
     theme(legend.position="bottom",
           legend.title = element_blank(),
-          axis.text.x = element_text(size=10),
+          axis.text.x = element_text(size=12),
           axis.text.y = element_text(size=10),
-          axis.title.y = element_text(size=13),
+          axis.title.y = element_blank(),
           axis.title.x = element_blank(),
           plot.title = element_text(hjust = .5,size=16),
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4),
           panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank());plot3
+          panel.grid.minor = element_blank())+
+  guides(fill = guide_legend(reverse = TRUE));plot3
 
 ggsave("FullPlots/Fig3Outcomes.png", width=7,height=5,dpi=300)
 ```
@@ -165,20 +165,21 @@ df5A<-df5A %>%
 df5A$Region<-factor(df5A$Region,levels=c("Pacific","Northeast & Mid-Atlantic","Great Lakes","Mountain West & Midwest Plains","South Central","South Atlantic"))
 
 plot5A<-ggplot(df5A,aes(x=Category,y=Percent,fill=Region,label=Percent))+
-    geom_bar(stat="identity",color="black")+
-    geom_text(size = 3, position = position_stack(vjust = 0.5))+
-    scale_fill_manual(values=c("#90be6d","#43aa8b","#577590","#f9c74f","#f3722c","#f94144"))+
-    #scale_x_discrete(expand = c(0,0))+
+    geom_bar(stat="identity",color="black",width=.75)+
+    geom_text(size = 4, 
+              position = position_stack(vjust = 0.5),
+              aes(label = sprintf("%1.2f%%", 100*Percent,
+                                  fontface="bold")))+
+    scale_fill_manual(values=c("#43aa8b","#61a8fa","#577590","#f9c74f","#f3722c","#f94144"))+
     scale_x_discrete(labels = function(Category) str_wrap(Category, width = 20))+
-    scale_y_discrete(limits=c(seq(0,100,10)),
-                     expand = c(0,0))+
+    scale_y_continuous(expand = c(0,0),
+                     labels = scales::percent)+
     labs(title="A. Student Population Distribution: Geographic Regions")+
-    ylab("Percentage")+
     theme(legend.position="right",
           legend.title = element_blank(),
-          axis.text.x = element_text(size=10),
+          axis.text.x = element_text(size=12),
           axis.text.y = element_text(size=10),
-          axis.title.y = element_text(size=13),
+          axis.title.y = element_blank(),
           axis.title.x = element_blank(),
           plot.title = element_text(hjust = .25,size=16),
           axis.line.x = element_line(size=.4),
@@ -199,20 +200,23 @@ df5B<-df5B %>%
 df5B$Region<-factor(df5B$Region,levels=c("Urban","Suburban","Rural"))
 
 plot5B<-ggplot(df5B,aes(x=Category,y=Percent,fill=Region,label=Percent))+
-    geom_bar(stat="identity",color="black")+
-    geom_text(size = 3, position = position_stack(vjust = 0.5))+
-    scale_fill_manual(values=c("#8DB38B","#56876d","#04724d"))+
+    geom_bar(stat="identity",color="black",width=0.55)+
+    geom_text(size = 4, 
+              position = position_stack(vjust = 0.5),
+              aes(label = sprintf("%1.2f%%", 100*Percent,
+                                  fontface="bold")))+
+    scale_fill_manual(values=c("#C19EE0","#A06CD5","#815ac0"))+
     #scale_x_discrete(expand = c(0,0))+
     scale_x_discrete(labels = function(Category) str_wrap(Category, width = 20))+
-    scale_y_discrete(limits=c(seq(0,100,10)),
-                     expand = c(0,0))+
+    scale_y_continuous(expand = c(0,0),
+                     labels = scales::percent)+
     labs(title="B. Student Population Distribution: Rural, Suburban, and Urban")+
     ylab("Percentage")+
     theme(legend.position="right",
           legend.title = element_blank(),
-          axis.text.x = element_text(size=10),
+          axis.text.x = element_text(size=12),
           axis.text.y = element_text(size=10),
-          axis.title.y = element_text(size=13),
+          axis.title.y = element_blank(),
           axis.title.x = element_blank(),
           plot.title = element_text(hjust = .25,size=16),
           axis.line.x = element_line(size=.4),
@@ -223,6 +227,7 @@ ggsave("FullPlots/Fig5B.png", dpi=300)
 ```
 
 ## Combo
+Did this in powerpoint
 ```{r eval=F}
 library(magick);library(ggpubr)
 map <- image_read('FullPlots/MapChart_Map.png')
@@ -234,4 +239,57 @@ library(patchwork)
 patchedfig5<-((plot5A / twitter ) | plot5B) + plot_layout(guides = 'keep')#+plot_annotation(tag_levels = 'A')
 patchedfig5
 ggsave("FullPlots/Fig1Citations.png", width=15,height=7,dpi=300)
+```
+
+# Fig 6 LibGuide Traffic
+```{r}
+library(gridExtra);library(grid)
+
+df6<-read.csv("Data/LibGuideTraffic.csv") 
+colnames(df6)[1]<-"Day"
+phase<-df6 %>% select(Day,Phase)
+
+df6<-df6 %>% 
+  select(-Phase) %>% 
+  pivot_longer(-Day,names_to="Year",values_to="Pageviews")
+df6$Year<-as.factor(gsub("X","",as.character(df6$Year)))
+
+Text1<-textGrob("Bracket Drop")
+
+plot6<-ggplot(data=df6,aes(x=Day,y=Pageviews,group=Year,color=Year))+
+  geom_line(size=1)+#,aes(linetype=Year)
+  scale_color_manual(values=c("#F9C74F", "#F8961E","#F94144"))+
+  #ylim(0,70000)+
+  scale_y_continuous(labels = comma,expand=c(0,0),
+                     breaks = pretty_breaks(n=8),limits = c(0,60000))+
+  scale_x_continuous(breaks=pretty_breaks(n=8),limits = c(-4,35))+
+  labs(title = "Mammal March Madness ASU LibGuide Daily Pageviews")+
+  xlab("Day")+ylab("Number of Pageviews")+
+  geom_segment(aes(x=0,y=53500,xend=10,yend=53500,color="segment"),
+               color="black",linetype="solid")+
+  geom_segment(aes(x=0,y=0,xend=0,yend=53500,color="segment"),
+               color="black",linetype="dashed")+
+  geom_segment(aes(x=10,y=0,xend=10,yend=53500,color="segment"),
+               color="black",linetype="dashed")+
+  annotate(geom="text",x=5,y=57000,size=4,lineheight=.85,
+           label="Pre-Tournament \n Species Research Period")+
+  geom_segment(aes(x=10,y=10000,xend=34,yend=10000,color="segment"),
+               color="black",linetype="solid")+
+  geom_segment(aes(x=34,y=0,xend=34,yend=10000,color="segment"),
+               color="black",linetype="dashed")+
+  annotate(geom="text",x=22,y=12500,size=4,lineheight=.85,
+           label="Tournament")+
+  theme(legend.position = "bottom",
+        legend.text = element_text(size=13),
+        plot.title = element_text(hjust = 0.5,size=16),
+          legend.title = element_blank(),
+          axis.text = element_text(size=11),
+          axis.ticks = element_line(size = 1), 
+          axis.title = element_text(size=13),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4));plot6
+
+ggsave("FullPlots/LibGuideTraffic.png", dpi=300)
 ```
