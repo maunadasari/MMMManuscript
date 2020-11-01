@@ -242,6 +242,7 @@ ggsave("FullPlots/Fig1Citations.png", width=15,height=7,dpi=300)
 ```
 
 # Fig 6 LibGuide Traffic
+## Bracket Drop = Day 0
 ```{r}
 library(gridExtra);library(grid)
 
@@ -292,4 +293,154 @@ plot6<-ggplot(data=df6,aes(x=Day,y=Pageviews,group=Year,color=Year))+
           axis.line.y = element_line(size=.4));plot6
 
 ggsave("FullPlots/LibGuideTraffic.png", dpi=300)
+```
+
+## Bracket Drop = Day -10
+```{r}
+df6<-read.csv("Data/LibGuideTraffic2.csv") 
+colnames(df6)[1]<-"Day"
+phase<-df6 %>% select(Day,Phase)
+
+df6<-df6 %>% 
+  select(-Phase) %>% 
+  pivot_longer(-Day,names_to="Year",values_to="Pageviews")
+df6$Year<-as.factor(gsub("X","",as.character(df6$Year)))
+
+
+plot6<-ggplot(data=df6,aes(x=Day,y=Pageviews,group=Year,color=Year))+
+  geom_line(size=1)+#,aes(linetype=Year)
+  scale_color_manual(values=c("#F9C74F", "#F8961E","#F94144"))+
+  #ylim(0,70000)+
+  scale_y_continuous(labels = comma,expand=c(0,0),
+                     breaks = pretty_breaks(n=8),limits = c(0,60000))+
+  scale_x_continuous(breaks=pretty_breaks(n=8),limits = c(-14,27))+
+  labs(title = "Mammal March Madness ASU LibGuide Daily Pageviews")+
+  xlab("Day of Tournament")+ylab("Number of Pageviews")+
+  geom_segment(aes(x=-10,y=53500,xend=0,yend=53500,color="segment"),
+               color="black",linetype="solid")+
+  geom_segment(aes(x=0,y=0,xend=0,yend=53500,color="segment"),
+               color="black",linetype="dashed")+
+  geom_segment(aes(x=-10,y=0,xend=-10,yend=53500,color="segment"),
+               color="black",linetype="dashed")+
+  annotate(geom="text",x=-5,y=57000,size=4,lineheight=.85,
+           label="Pre-Tournament \n Species Research Period")+
+  geom_segment(aes(x=0,y=10000,xend=24,yend=10000,color="segment"),
+               color="black",linetype="solid")+
+  geom_segment(aes(x=24,y=0,xend=24,yend=10000,color="segment"),
+               color="black",linetype="dashed")+
+  annotate(geom="text",x=12,y=12500,size=4,lineheight=.85,
+           label="Tournament")+
+  theme(legend.position = "bottom",
+        legend.text = element_text(size=13),
+        plot.title = element_text(hjust = 0.5,size=16),
+          legend.title = element_blank(),
+          axis.text = element_text(size=11),
+          axis.ticks = element_line(size = 1), 
+          axis.title = element_text(size=13),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4));plot6
+
+ggsave("FullPlots/LibGuideTraffic_TournamentDay.png", dpi=300)
+```
+
+# Fig7: Twitter Engagements
+```{r}
+df7A<-read.csv("Data/TwitterEngagements.csv")
+colnames(df7A)[1]<-"Year"
+df7C<-read.csv("Data/BlogpostViews.csv")
+colnames(df7C)[1]<-"Year"
+
+plot7A<-ggplot(data=df7A,aes(x=Year,y=Number.of.Tweets))+
+  geom_line()+geom_point()+ylim(35000,47000)+
+  ylab("Number of Tweets Using MMM Hashtag")+
+  scale_x_continuous(breaks=pretty_breaks(n=3))+
+  scale_y_continuous(labels = comma)+
+  labs(title="B. Mammal March Madness Twitter Engagements:\n Tweets Using the MMM Hashtag")+
+  theme(plot.title = element_text(hjust = 0.5,size=16),
+          legend.title = element_blank(),
+          axis.text = element_text(size=11),
+          axis.ticks = element_line(size = 1), 
+          axis.title = element_text(size=13),
+          axis.title.x = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4));plot7A
+plot7B<-ggplot(data=df7A,aes(x=Year,y=Twitter.Timeline.Deliveries))+
+  geom_line()+geom_point()+ylim(700000000,1400000000)+
+  ylab("Number of Twitter Timeline Deliveries")+
+  scale_x_continuous(breaks=pretty_breaks(n=3))+
+  scale_y_continuous(labels = comma,breaks=pretty_breaks(n=8))+
+  labs(title="C. Mammal March Madness Twitter Engagements:\n Deliveries to Twitter Timelines")+
+  theme(plot.title = element_text(hjust = 0.5,size=16),
+          legend.title = element_blank(),
+          axis.text = element_text(size=11),
+          axis.ticks = element_line(size = 1), 
+          axis.title = element_text(size=13),
+          axis.title.x = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4));plot7B
+plot7C<-ggplot(data=df7C,aes(x=Year,y=Blogpost.Views))+
+  geom_line()+geom_point()+ylim(20000,300000)+
+  ylab("Number of Blogpost Views")+
+  scale_x_continuous(breaks=pretty_breaks(n=7))+
+  scale_y_continuous(labels = comma,breaks=pretty_breaks(n=8))+
+  labs(title="A. Mammal March Madness Blogpost Engagements")+
+  theme(plot.title = element_text(hjust = 0.5,size=16),
+          legend.title = element_blank(),
+          axis.text = element_text(size=11),
+          axis.ticks = element_line(size = 1), 
+          axis.title = element_text(size=13),
+          axis.title.x = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4));plot7C
+```
+```{r fig.width=18,fig.height=5}
+library(patchwork)
+patchedfig7<-plot7C+ plot7A + plot7B + plot_layout(guides = 'keep')#+plot_annotation(tag_levels = 'A')
+patchedfig7
+ggsave("FullPlots/Fig7Engagements.png", width=18,height=5,dpi=300)
+```
+
+## Fig 7 Two Axes
+```{r}
+df7A<-read.csv("Data/TwitterEngagements.csv")
+colnames(df7A)[1]<-"Year"
+#df7A<-df7A %>% 
+#  pivot_longer(-Year,names_to="Engagement_Type",values_to="Use")
+plot7A<-ggplot(data=df7A,aes(x=Year,y=Number.of.Tweets))+
+  geom_line()+geom_point(pch=15,size=3)+ylim(35000,47000)+
+  ylab("Number of Tweets Using MMM Hashtag")+
+  scale_x_continuous(breaks=pretty_breaks(n=3))+
+  scale_y_continuous(labels = comma)+
+  labs(title="B. Mammal March Madness Twitter Engagements")+
+  geom_line(aes(y=Twitter.Timeline.Deliveries/3000))+
+  geom_point(aes(y=Twitter.Timeline.Deliveries/3000),pch=24,size=3)+
+  scale_y_continuous(sec.axis = sec_axis(~.*3000,
+                                         name="Number of Twitter Timeline Deliveries"),
+                     labels = comma,
+                     breaks=pretty_breaks(n=8))+
+  theme(plot.title = element_text(hjust = 0.5,size=16),
+          legend.position = "bottom",
+          axis.text = element_text(size=11),
+          axis.ticks = element_line(size = 1), 
+          axis.title = element_text(size=13),
+          axis.title.x = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4));plot7A
+```
+
+```{r fig.width=12,fig.height=5}
+library(patchwork)
+patchedfig7<-plot7C+ plot7A + plot_layout(guides = 'keep')#+plot_annotation(tag_levels = 'A')
+patchedfig7
+ggsave("FullPlots/Fig7Engagements_DoubleAxis.png", width=12,height=5,dpi=300)
 ```
