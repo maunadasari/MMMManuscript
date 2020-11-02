@@ -95,7 +95,7 @@ ggsave("FullPlots/Fig1Citations.png", width=15,height=7,dpi=300)
 ```
 
 # Fig2: Species Representation
-```{r}
+```{r fig.height=8}
 fig2colors<-read.csv("Data/Fig2.csv") %>% select(Class,HexCode)
 
 df2<-read.csv("Data/Fig2.csv") %>% 
@@ -110,15 +110,43 @@ sorted<-df2 %>%
     pull(Class)
 sorted_colors<-df2 %>% 
     filter(Category=="Mammalian Class") %>% 
+    arrange((Represented)) %>% 
+    pull(HexCode)
+
+sorted_colors_desc<-df2 %>% 
+    filter(Category=="Mammalian Class") %>% 
     arrange(desc(Represented)) %>% 
     pull(HexCode)
+
 df2$Class<-factor(as.character(df2$Class),levels=sorted)
 df2$HexCode<-factor(as.character(df2$HexCode),levels=as.character(sorted_colors))
-df2$HexCode<-fct_rev(df2$HexCode)
+df2$HexCode2<-factor(as.character(df2$HexCode),levels=as.character(sorted_colors_desc))
+#df2$HexCode<-fct_rev(df2$HexCode)
+
+fig2colors$HexCode<-factor(as.character(fig2colors$HexCode),levels=as.character(sorted_colors))
+mycols<-as.character(rev(fig2colors$HexCode))
 
 plot2<-ggplot(df2,aes(x=Category,y=Represented,fill=Class))+
-    geom_bar(stat="identity",color="black")+
-    scale_fill_manual(name="Class",values=as.character(df2$HexCode));plot2
+    geom_bar(stat="identity",color="black",width=.75)+
+    scale_fill_manual(name="Class",values=mycols)+
+    scale_y_continuous(expand = c(0,0),labels = scales::percent)+
+    scale_x_discrete(labels = function(Category) str_wrap(Category, width = 20))+
+    labs(title="Proportion of Species by Order across \n Mammalian Class & March Mammal Madness")+
+    theme(legend.position="right",
+          legend.title = element_blank(),
+          legend.text = element_text(size=12),
+          axis.text.x = element_text(size=18),
+          axis.text.y = element_text(size=14),
+          axis.title.y = element_blank(),
+          axis.title.x = element_blank(),
+          plot.title = element_text(hjust = .5,size=22),
+          axis.line.x = element_line(size=.4),
+          axis.line.y = element_line(size=.4),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank())+
+  guides(fill=guide_legend(ncol=1));plot2
+
+ggsave("FullPlots/MammalClassRepresentation_large.png", height=10,dpi=300)
 ```
 
 # Fig3: Outcome Proportions
