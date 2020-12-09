@@ -8,7 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse);library(gridExtra);library(scales);library(extrafont)
-theme_set(theme_minimal()+theme(text=element_text(family="Arial")))
+theme_set(theme_minimal()+theme(text=element_text(family="Arial",color="black")))
 ```
 
 # Fig1: Scholarly Literature {.tabset}
@@ -31,8 +31,8 @@ plot1A<-ggplot(df1A,aes(x=as.factor(Year),y=citations))+
     theme(plot.title = element_text(hjust = 0.5,size=16),
           legend.position = c(.2,.8),
           legend.title = element_blank(),
-          axis.text = element_text(size=12),
-          axis.title = element_text(size=14),
+          axis.text = element_text(size=12,color="black"),
+          axis.title = element_text(size=14,color="black"),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(),
           axis.line.x = element_line(size=.4),
@@ -50,9 +50,9 @@ plot1B<-ggplot(df1B,aes(x=fct_reorder(Publication,Citations),y=Citations))+
     ylab("Number of Citations")+
     coord_flip()+
     labs(title="B. Top 25 Journals Cited in Narrations")+
-    theme(plot.title = element_text(hjust = .5,size=16),
-          axis.text = element_text(size=12),
-          axis.title.x = element_text(size=14),
+    theme(plot.title = element_text(hjust = .5,size=16,color="black"),
+          axis.text = element_text(size=12,color="black"),
+          axis.title.x = element_text(size=14,color="black"),
           axis.title.y = element_blank(),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(),
@@ -76,10 +76,11 @@ plot1C<-ggplot(aes(x=Year,y=Citations),
     theme(axis.text.x = element_text(angle = 90,
                                      vjust = 0.5, 
                                      hjust=1,
-                                     size=12),
-          axis.text.y = element_text(size=12),
-          axis.title = element_text(size=14),
-          plot.title = element_text(hjust = .5,size=16),
+                                     size=12,
+                                     color="black"),
+          axis.text.y = element_text(size=12,color="black"),
+          axis.title = element_text(size=14,color="black"),
+          plot.title = element_text(hjust = .5,size=16,color="black"),
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4),
           panel.grid.major = element_blank(), 
@@ -127,19 +128,19 @@ fig2colors$HexCode<-factor(as.character(fig2colors$HexCode),levels=as.character(
 mycols<-as.character(rev(fig2colors$HexCode))
 
 plot2<-ggplot(df2,aes(x=Category,y=Represented,fill=Class))+
-    geom_bar(stat="identity",color="black",width=.75)+
+    geom_bar(stat="identity",color="black",width=.60)+
     scale_fill_manual(name="Class",values=mycols)+
     scale_y_continuous(expand = c(0,0),labels = scales::percent)+
     scale_x_discrete(labels = function(Category) str_wrap(Category, width = 20))+
     labs(title="Proportion of Species by Order across \n Mammalian Class & March Mammal Madness")+
     theme(legend.position="right",
           legend.title = element_blank(),
-          legend.text = element_text(size=12),
-          axis.text.x = element_text(size=18),
-          axis.text.y = element_text(size=14),
+          legend.text = element_text(size=18),
+          axis.text.x = element_text(size=22,color="black"),
+          axis.text.y = element_text(size=20,color="black"),
           axis.title.y = element_blank(),
           axis.title.x = element_blank(),
-          plot.title = element_text(hjust = .5,size=22),
+          plot.title = element_text(hjust = .5,size=24,color="black"),
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4),
           panel.grid.major = element_blank(), 
@@ -161,22 +162,25 @@ df3$Year<-gsub("X","",as.character(df3$Year))
 df3$Outcome<-factor(df3$Outcome,levels=c("Other","Deus ex Machina","Withdrawal","TKO"))
 
 plot3<-ggplot(df3,aes(x=Year,y=Percent,fill=Outcome))+
-    geom_bar(stat="identity",color="black")+
+    geom_bar(stat="identity",color="black",width=.80,size=1)+
     scale_fill_manual(values=c("#90BE6D","#577590","#F9C74F","#F94144"))+
     #scale_x_discrete(expand = c(0,0))+
     scale_y_continuous(expand = c(0,0),labels = scales::percent)+
     labs(title="Battle Outcomes by Tournament Year")+
     theme(legend.position="bottom",
           legend.title = element_blank(),
-          axis.text.x = element_text(size=12),
-          axis.text.y = element_text(size=10),
+          legend.text = element_text(size=12),
+          axis.text.x = element_text(size=12,color="black"),
+          axis.text.y = element_text(size=12,color="black"),
           axis.title.y = element_blank(),
           axis.title.x = element_blank(),
-          plot.title = element_text(hjust = .5,size=16),
+          plot.title = element_text(hjust = .5,size=16,color="black"),
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4),
           panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank())+
+          panel.grid.minor = element_blank(),
+          legend.key.width=unit(2,"cm"),
+          panel.border = element_rect(colour = "black", fill=NA, size=1.5))+
   guides(fill = guide_legend(reverse = TRUE));plot3
 
 ggsave("FullPlots/Fig3Outcomes.tiff", width=7,height=5,dpi=300)
@@ -184,20 +188,20 @@ ggsave("FullPlots/Fig3Outcomes.tiff", width=7,height=5,dpi=300)
 
 # Fig5: Student Reach
 ## A Regional Reach
-```{r}
+```{r fig.height=5,fig.width=10}
 df5A<-read.csv("Data/Fig5A.csv")
-colnames(df5A)<-c("Region","US K-12 Public School Population","US K-12 Students Engaged in Mammal March Madness")
+colnames(df5A)<-c("Region","US K-12 Public School Population","US K-12 Students Engaged in March Mammal Madness")
 
 df5A<-df5A %>% 
     pivot_longer(-Region,names_to = "Category",values_to = "Percent")
 df5A$Region<-factor(df5A$Region,levels=c("Pacific","Northeast & Mid-Atlantic","Great Lakes","Mountain West & Midwest Plains","South Central","South Atlantic"))
 
 plot5A<-ggplot(df5A,aes(x=Category,y=Percent,fill=Region,label=Percent))+
-    geom_bar(stat="identity",color="black",width=.75)+
+    geom_bar(stat="identity",color="black",width=.65)+
     geom_text(size = 4, 
               position = position_stack(vjust = 0.5),
-              aes(label = sprintf("%1.2f%%", 100*Percent,
-                                  fontface="bold")))+
+              aes(label = sprintf("%1.1f%%", 100*Percent,
+                                  fontface="bold",color="black")))+
     scale_fill_manual(values=c("#43aa8b","#61a8fa","#577590","#f9c74f","#f3722c","#f94144"))+
     scale_x_discrete(labels = function(Category) str_wrap(Category, width = 20))+
     scale_y_continuous(expand = c(0,0),
@@ -205,11 +209,12 @@ plot5A<-ggplot(df5A,aes(x=Category,y=Percent,fill=Region,label=Percent))+
     labs(title="A. Student Population Distribution: Geographic Regions")+
     theme(legend.position="right",
           legend.title = element_blank(),
-          axis.text.x = element_text(size=12),
-          axis.text.y = element_text(size=10),
+          legend.text = element_text(size=14,color="black"),
+          axis.text.x = element_text(size=12,color="black"),
+          axis.text.y = element_text(size=10,color="black"),
           axis.title.y = element_blank(),
           axis.title.x = element_blank(),
-          plot.title = element_text(hjust = .25,size=16),
+          plot.title = element_text(hjust = .25,size=16,color="black"),
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4),
           panel.grid.major = element_blank(), 
@@ -219,20 +224,20 @@ ggsave("FullPlots/Fig5A.tiff",dpi=300)
 ```
 
 ## B Region Type
-```{r}
+```{r fig.height=5,fig.width=10}
 df5B<-read.csv("Data/Fig5B.csv")
-colnames(df5B)<-c("Region","US K-12 Public School Population","US K-12 Students Engaged in Mammal March Madness")
+colnames(df5B)<-c("Region","US K-12 Public School Population","US K-12 Students Engaged in March Mammal Madness")
 
 df5B<-df5B %>% 
     pivot_longer(-Region,names_to = "Category",values_to = "Percent")
 df5B$Region<-factor(df5B$Region,levels=c("Urban","Suburban","Rural"))
 
 plot5B<-ggplot(df5B,aes(x=Category,y=Percent,fill=Region,label=Percent))+
-    geom_bar(stat="identity",color="black",width=0.55)+
+    geom_bar(stat="identity",color="black",width=0.35)+
     geom_text(size = 4, 
               position = position_stack(vjust = 0.5),
-              aes(label = sprintf("%1.2f%%", 100*Percent,
-                                  fontface="bold")))+
+              aes(label = sprintf("%1.1f%%", 100*Percent,
+                                  fontface="bold",color="black")))+
     scale_fill_manual(values=c("#C19EE0","#A06CD5","#815ac0"))+
     #scale_x_discrete(expand = c(0,0))+
     scale_x_discrete(labels = function(Category) str_wrap(Category, width = 20))+
@@ -242,11 +247,12 @@ plot5B<-ggplot(df5B,aes(x=Category,y=Percent,fill=Region,label=Percent))+
     ylab("Percentage")+
     theme(legend.position="right",
           legend.title = element_blank(),
-          axis.text.x = element_text(size=12),
-          axis.text.y = element_text(size=10),
+          legend.text = element_text(size=16,color="black"),
+          axis.text.x = element_text(size=12,color="black"),
+          axis.text.y = element_text(size=10,color="black"),
           axis.title.y = element_blank(),
           axis.title.x = element_blank(),
-          plot.title = element_text(hjust = .25,size=16),
+          plot.title = element_text(hjust = .25,size=16,color="black"),
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4),
           panel.grid.major = element_blank(), 
@@ -292,7 +298,7 @@ plot6<-ggplot(data=df6,aes(x=Day,y=Pageviews,group=Year,color=Year))+
   scale_y_continuous(labels = comma,expand=c(0,0),
                      breaks = pretty_breaks(n=8),limits = c(0,60000))+
   scale_x_continuous(breaks=pretty_breaks(n=8),limits = c(-4,35))+
-  labs(title = "Mammal March Madness ASU LibGuide Daily Pageviews")+
+  labs(title = "March Mammal Madness ASU LibGuide Daily Pageviews")+
   xlab("Day")+ylab("Number of Pageviews")+
   geom_segment(aes(x=0,y=53500,xend=10,yend=53500,color="segment"),
                color="black",linetype="solid")+
@@ -342,7 +348,7 @@ plot6<-ggplot(data=df6,aes(x=Day,y=Pageviews,group=Year,color=Year))+
   scale_y_continuous(labels = comma,expand=c(0,0),
                      breaks = pretty_breaks(n=8),limits = c(0,60000))+
   scale_x_continuous(breaks=pretty_breaks(n=8),limits = c(-14,27))+
-  labs(title = "Mammal March Madness ASU LibGuide Daily Pageviews")+
+  labs(title = "March Mammal Madness ASU LibGuide Daily Pageviews")+
   xlab("Day of Tournament")+ylab("Number of Pageviews")+
   geom_segment(aes(x=-10,y=53500,xend=0,yend=53500,color="segment"),
                color="black",linetype="solid")+
@@ -385,7 +391,7 @@ plot7A<-ggplot(data=df7A,aes(x=Year,y=Number.of.Tweets))+
   ylab("Number of Tweets Using MMM Hashtag")+
   scale_x_continuous(breaks=pretty_breaks(n=3))+
   scale_y_continuous(labels = comma)+
-  labs(title="B. Mammal March Madness Twitter Engagements:\n Tweets Using the MMM Hashtag")+
+  labs(title="B. March Mammal Madness Twitter Engagements:\n Tweets Using the MMM Hashtag")+
   theme(plot.title = element_text(hjust = 0.5,size=16),
           legend.title = element_blank(),
           axis.text = element_text(size=11),
@@ -401,7 +407,7 @@ plot7B<-ggplot(data=df7A,aes(x=Year,y=Twitter.Timeline.Deliveries))+
   ylab("Number of Twitter Timeline Deliveries")+
   scale_x_continuous(breaks=pretty_breaks(n=3))+
   scale_y_continuous(labels = comma,breaks=pretty_breaks(n=8))+
-  labs(title="C. Mammal March Madness Twitter Engagements:\n Deliveries to Twitter Timelines")+
+  labs(title="C. March Mammal Madness Twitter Engagements:\n Deliveries to Twitter Timelines")+
   theme(plot.title = element_text(hjust = 0.5,size=16),
           legend.title = element_blank(),
           axis.text = element_text(size=11),
@@ -417,7 +423,7 @@ plot7C<-ggplot(data=df7C,aes(x=Year,y=Blogpost.Views))+
   ylab("Number of Blogpost Views")+
   scale_x_continuous(breaks=pretty_breaks(n=7))+
   scale_y_continuous(labels = comma,breaks=pretty_breaks(n=8))+
-  labs(title="A. Mammal March Madness Blogpost Engagements")+
+  labs(title="A. March Mammal Madness Blogpost Engagements")+
   theme(plot.title = element_text(hjust = 0.5,size=16),
           legend.title = element_blank(),
           axis.text = element_text(size=11),
@@ -447,7 +453,7 @@ plot7A<-ggplot(data=df7A,aes(x=Year,y=Number.of.Tweets))+
   ylab("Number of Tweets Using MMM Hashtag")+
   scale_x_continuous(breaks=pretty_breaks(n=3))+
   scale_y_continuous(labels = comma)+
-  labs(title="B. Mammal March Madness Twitter Engagements")+
+  labs(title="B. March Mammal Madness Twitter Engagements")+
   geom_line(aes(y=Twitter.Timeline.Deliveries/3000))+
   geom_point(aes(y=Twitter.Timeline.Deliveries/3000),pch=24,size=3)+
   scale_y_continuous(sec.axis = sec_axis(~.*3000,
