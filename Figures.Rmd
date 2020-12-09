@@ -7,8 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse);library(gridExtra);library(scales)
-theme_set(theme_minimal())
+library(tidyverse);library(gridExtra);library(scales);library(extrafont)
+theme_set(theme_minimal()+theme(text=element_text(family="Arial")))
 ```
 
 # Fig1: Scholarly Literature {.tabset}
@@ -22,17 +22,17 @@ df1A$Type<-factor(df1A$Type,
                     levels = c("Genetics","Battle Narration"))
 
 plot1A<-ggplot(df1A,aes(x=as.factor(Year),y=citations))+
-    geom_col(aes(fill=Type),color="black")+
+    geom_col(aes(fill=Type),color="black",width=.75)+
     xlab("Year")+ylab("Number of Citations")+
     scale_y_continuous(breaks = seq(0, 500, by = 50),
                        expand = c(0,0))+
-    scale_fill_manual(values=c("#7B287B","#3C557C"))+
+    scale_fill_manual(values=c("#7B287B","#2a52be"))+
     labs(title="A. Battle Citations by Year")+
     theme(plot.title = element_text(hjust = 0.5,size=16),
           legend.position = c(.2,.8),
           legend.title = element_blank(),
-          axis.text = element_text(size=10),
-          axis.title = element_text(size=13),
+          axis.text = element_text(size=12),
+          axis.title = element_text(size=14),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(),
           axis.line.x = element_line(size=.4),
@@ -46,13 +46,13 @@ colnames(df1B)<-c("Publication","Citations")
 jlevel<-levels(df1B$Publication)
 
 plot1B<-ggplot(df1B,aes(x=fct_reorder(Publication,Citations),y=Citations))+
-    geom_col(fill="#3C557C",color="#212F45",width = 1)+ #teal: 206E83
+    geom_col(fill="#2a52be",color="#212F45",width = 1)+ #teal: 206E83
     ylab("Number of Citations")+
     coord_flip()+
     labs(title="B. Top 25 Journals Cited in Narrations")+
     theme(plot.title = element_text(hjust = .5,size=16),
-          axis.text.y = element_text(size=10),
-          axis.title.x = element_text(size=13),
+          axis.text = element_text(size=12),
+          axis.title.x = element_text(size=14),
           axis.title.y = element_blank(),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(),
@@ -67,7 +67,7 @@ colnames(df1C)<-c("Year","Citations")
 
 plot1C<-ggplot(aes(x=Year,y=Citations),
                data=df1C)+
-    geom_col(fill="#3C557C",color="#212F45",width = 1)+ #lighter teal 029597
+    geom_col(fill="#2a52be",color="#212F45",width = 1)+ #lighter teal 029597
     ylab("Number of Citations")+
     #xlab("Year")+
     scale_x_continuous(breaks = pretty_breaks(n=12),expand = c(0,0))+
@@ -76,9 +76,9 @@ plot1C<-ggplot(aes(x=Year,y=Citations),
     theme(axis.text.x = element_text(angle = 90,
                                      vjust = 0.5, 
                                      hjust=1,
-                                     size=10),
-          axis.text.y = element_text(size=10),
-          axis.title = element_text(size=13),
+                                     size=12),
+          axis.text.y = element_text(size=12),
+          axis.title = element_text(size=14),
           plot.title = element_text(hjust = .5,size=16),
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4),
@@ -91,7 +91,7 @@ plot1C<-ggplot(aes(x=Year,y=Citations),
 library(patchwork)
 patchedfig1<-((plot1A / plot1C ) | plot1B) + plot_layout(guides = 'keep')#+plot_annotation(tag_levels = 'A')
 patchedfig1
-ggsave("FullPlots/Fig1Citations.png", width=15,height=7,dpi=300)
+ggsave("FullPlots/Fig1Citations.tiff", width=15,height=7,dpi=300)
 ```
 
 # Fig2: Species Representation
@@ -146,7 +146,7 @@ plot2<-ggplot(df2,aes(x=Category,y=Represented,fill=Class))+
           panel.grid.minor = element_blank())+
   guides(fill=guide_legend(ncol=1));plot2
 
-ggsave("FullPlots/MammalClassRepresentation_large.png", height=10,dpi=300)
+ggsave("FullPlots/MammalClassRepresentation_large.tiff", height=10,dpi=300)
 ```
 
 # Fig3: Outcome Proportions
@@ -179,7 +179,7 @@ plot3<-ggplot(df3,aes(x=Year,y=Percent,fill=Outcome))+
           panel.grid.minor = element_blank())+
   guides(fill = guide_legend(reverse = TRUE));plot3
 
-ggsave("FullPlots/Fig3Outcomes.png", width=7,height=5,dpi=300)
+ggsave("FullPlots/Fig3Outcomes.tiff", width=7,height=5,dpi=300)
 ```
 
 # Fig5: Student Reach
@@ -215,7 +215,7 @@ plot5A<-ggplot(df5A,aes(x=Category,y=Percent,fill=Region,label=Percent))+
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank());plot5A
 
-ggsave("FullPlots/Fig5A.png",dpi=300)
+ggsave("FullPlots/Fig5A.tiff",dpi=300)
 ```
 
 ## B Region Type
@@ -251,14 +251,14 @@ plot5B<-ggplot(df5B,aes(x=Category,y=Percent,fill=Region,label=Percent))+
           axis.line.y = element_line(size=.4),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank());plot5B
-ggsave("FullPlots/Fig5B.png", dpi=300)
+ggsave("FullPlots/Fig5B.tiff", dpi=300)
 ```
 
 ## Combo
 Did this in powerpoint
 ```{r eval=F}
 library(magick);library(ggpubr)
-map <- image_read('FullPlots/MapChart_Map.png')
+map <- image_read('FullPlots/MapChart_Map.tiff')
 twitter <- ggplot() +
   background_image(map) 
 twitter
@@ -266,7 +266,7 @@ twitter
 library(patchwork)
 patchedfig5<-((plot5A / twitter ) | plot5B) + plot_layout(guides = 'keep')#+plot_annotation(tag_levels = 'A')
 patchedfig5
-ggsave("FullPlots/Fig1Citations.png", width=15,height=7,dpi=300)
+ggsave("FullPlots/Fig1Citations.tiff", width=15,height=7,dpi=300)
 ```
 
 # Fig 6 LibGuide Traffic
@@ -320,7 +320,7 @@ plot6<-ggplot(data=df6,aes(x=Day,y=Pageviews,group=Year,color=Year))+
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4));plot6
 
-ggsave("FullPlots/LibGuideTraffic.png", dpi=300)
+ggsave("FullPlots/LibGuideTraffic.tiff", dpi=300)
 ```
 
 ## Bracket Drop = Day -10
@@ -370,7 +370,7 @@ plot6<-ggplot(data=df6,aes(x=Day,y=Pageviews,group=Year,color=Year))+
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4));plot6
 
-ggsave("FullPlots/LibGuideTraffic_TournamentDay.png", dpi=300)
+ggsave("FullPlots/LibGuideTraffic_TournamentDay.tiff", dpi=300)
 ```
 
 # Fig7: Twitter Engagements
@@ -433,7 +433,7 @@ plot7C<-ggplot(data=df7C,aes(x=Year,y=Blogpost.Views))+
 library(patchwork)
 patchedfig7<-plot7C+ plot7A + plot7B + plot_layout(guides = 'keep')#+plot_annotation(tag_levels = 'A')
 patchedfig7
-ggsave("FullPlots/Fig7Engagements.png", width=18,height=5,dpi=300)
+ggsave("FullPlots/Fig7Engagements.tiff", width=18,height=5,dpi=300)
 ```
 
 ## Fig 7 Two Axes
@@ -470,5 +470,5 @@ plot7A<-ggplot(data=df7A,aes(x=Year,y=Number.of.Tweets))+
 library(patchwork)
 patchedfig7<-plot7C+ plot7A + plot_layout(guides = 'keep')#+plot_annotation(tag_levels = 'A')
 patchedfig7
-ggsave("FullPlots/Fig7Engagements_DoubleAxis.png", width=12,height=5,dpi=300)
+ggsave("FullPlots/Fig7Engagements_DoubleAxis.tiff", width=12,height=5,dpi=300)
 ```
