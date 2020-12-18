@@ -14,7 +14,7 @@ theme_set(theme_minimal()+theme(text=element_text(family="Arial",color="black"))
 # Fig1: Scholarly Literature {.tabset}
 ## A Battle Citations By Year
 ```{r}
-df1A<-read.csv("Data/Fig1/NumberCitationsYear.csv")
+df1A<-read.csv("Data/Citations/NumberCitationsYear.csv")
 df1A[is.na(df1A)]<-0
 colnames(df1A)<-c("Year","Battle Narration", "Genetics")
 df1A<-df1A %>% pivot_longer(-Year,names_to = "Type",values_to = "citations")
@@ -41,7 +41,7 @@ plot1A<-ggplot(df1A,aes(x=as.factor(Year),y=citations))+
 
 ## B Battle Narration Top 25 Cited Journals
 ```{r}
-df1B<-read.csv("Data/Fig1/CitationsByJournal.csv",stringsAsFactors = T)
+df1B<-read.csv("Data/Citations/CitationsByJournal.csv",stringsAsFactors = T)
 colnames(df1B)<-c("Publication","Citations")
 jlevel<-levels(df1B$Publication)
 
@@ -62,7 +62,7 @@ plot1B<-ggplot(df1B,aes(x=fct_reorder(Publication,Citations),y=Citations))+
 
 ## C Publication Year of Citations
 ```{r}
-df1C<-read.csv("Data/Fig1/CitationsYears.csv")
+df1C<-read.csv("Data/Citations/CitationsYears.csv")
 colnames(df1C)<-c("Year","Citations")
 
 plot1C<-ggplot(aes(x=Year,y=Citations),
@@ -97,9 +97,9 @@ ggsave("FullPlots/Fig1Citations.tiff", width=15,height=7,dpi=300)
 
 # Fig2: Species Representation
 ```{r fig.height=8}
-fig2colors<-read.csv("Data/Fig2.csv") %>% select(Class,HexCode)
+fig2colors<-read.csv("Data/SpeciesRep.csv") %>% select(Class,HexCode)
 
-df2<-read.csv("Data/Fig2.csv") %>% 
+df2<-read.csv("Data/SpeciesRep.csv") %>% 
     select(Class,Class.Representation,March.Mammal.Madness) %>% 
     rename("Mammalian Class" = Class.Representation,
            "March Mammal Madness" = March.Mammal.Madness) %>% 
@@ -140,11 +140,12 @@ plot2<-ggplot(df2,aes(x=Category,y=Represented,fill=Class))+
           axis.text.y = element_text(size=20,color="black"),
           axis.title.y = element_blank(),
           axis.title.x = element_blank(),
-          plot.title = element_text(hjust = .5,size=24,color="black"),
+          plot.title = element_text(hjust = .5,size=24,color="black",vjust=4),
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4),
           panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank())+
+          panel.grid.minor = element_blank(),
+        plot.margin = unit(c(1,1,1,1), "cm"))+
   guides(fill=guide_legend(ncol=1));plot2
 
 ggsave("FullPlots/MammalClassRepresentation_large.tiff", height=10,dpi=300)
@@ -152,7 +153,7 @@ ggsave("FullPlots/MammalClassRepresentation_large.tiff", height=10,dpi=300)
 
 # Fig3: Outcome Proportions
 ```{r}
-df3<-read.csv("Data/Fig3.csv")
+df3<-read.csv("Data/OutcomeProportions.csv")
 colnames(df3)[1]<-"Outcome"
 
 df3<-df3 %>% 
@@ -189,7 +190,7 @@ ggsave("FullPlots/Fig3Outcomes.tiff", width=7,height=5,dpi=300)
 # Fig5: Student Reach
 ## A Regional Reach
 ```{r fig.height=5,fig.width=10}
-df5A<-read.csv("Data/Fig5A.csv")
+df5A<-read.csv("Data/StudentReach_Geographic.csv")
 colnames(df5A)<-c("Region","US K-12 Public School Population","US K-12 Students Engaged in March Mammal Madness")
 
 df5A<-df5A %>% 
@@ -225,7 +226,7 @@ ggsave("FullPlots/Fig5A.tiff",dpi=300)
 
 ## B Region Type
 ```{r fig.height=5,fig.width=8}
-df5B<-read.csv("Data/Fig5B.csv")
+df5B<-read.csv("Data/StudentReach_AreaType.csv")
 colnames(df5B)<-c("Region","US K-12 Public School Population","US K-12 Students Engaged in March Mammal Madness")
 
 df5B<-df5B %>% 
@@ -330,56 +331,6 @@ plot6<-ggplot(data=df6,aes(x=Day,y=Pageviews,group=Year,color=Year))+
         plot.margin = unit(c(1,1,1,1), "cm"));plot6
 
 ggsave("FullPlots/LibGuideTraffic.tiff", dpi=300)
-```
-
-## Bracket Drop = Day -10
-```{r}
-df6<-read.csv("Data/LibGuideTraffic2.csv") 
-colnames(df6)[1]<-"Day"
-phase<-df6 %>% select(Day,Phase)
-
-df6<-df6 %>% 
-  select(-Phase) %>% 
-  pivot_longer(-Day,names_to="Year",values_to="Pageviews")
-df6$Year<-as.factor(gsub("X","",as.character(df6$Year)))
-
-
-plot6<-ggplot(data=df6,aes(x=Day,y=Pageviews,group=Year,color=Year))+
-  geom_line(size=1)+#,aes(linetype=Year)
-  scale_color_manual(values=c("#F9C74F", "#F8961E","#F94144"))+
-  #ylim(0,70000)+
-  scale_y_continuous(labels = comma,expand=c(0,0),
-                     breaks = pretty_breaks(n=8),limits = c(0,60000))+
-  scale_x_continuous(breaks=pretty_breaks(n=8),limits = c(-14,27))+
-  labs(title = "March Mammal Madness ASU LibGuide Daily Pageviews")+
-  xlab("Day of Tournament")+ylab("Number of Pageviews")+
-  geom_segment(aes(x=-10,y=53500,xend=0,yend=53500,color="segment"),
-               color="black",linetype="solid")+
-  geom_segment(aes(x=0,y=0,xend=0,yend=53500,color="segment"),
-               color="black",linetype="dashed")+
-  geom_segment(aes(x=-10,y=0,xend=-10,yend=53500,color="segment"),
-               color="black",linetype="dashed")+
-  annotate(geom="text",x=-5,y=57000,size=4,lineheight=.85,
-           label="Pre-Tournament \n Species Research Period")+
-  geom_segment(aes(x=0,y=10000,xend=24,yend=10000,color="segment"),
-               color="black",linetype="solid")+
-  geom_segment(aes(x=24,y=0,xend=24,yend=10000,color="segment"),
-               color="black",linetype="dashed")+
-  annotate(geom="text",x=12,y=12500,size=4,lineheight=.85,
-           label="Tournament")+
-  theme(legend.position = "bottom",
-        legend.text = element_text(size=13),
-        plot.title = element_text(hjust = 0.5,size=16),
-          legend.title = element_blank(),
-          axis.text = element_text(size=11),
-          axis.ticks = element_line(size = 1), 
-          axis.title = element_text(size=13),
-          panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank(),
-          axis.line.x = element_line(size=.4),
-          axis.line.y = element_line(size=.4));plot6
-
-ggsave("FullPlots/LibGuideTraffic_TournamentDay.tiff", dpi=300)
 ```
 
 # Fig7: Twitter Engagements
