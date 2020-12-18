@@ -151,8 +151,8 @@ plot2<-ggplot(df2,aes(x=Category,y=Represented,fill=Class))+
 ggsave("FullPlots/MammalClassRepresentation_large.tiff", height=10,dpi=300)
 ```
 
-# Fig3: Outcome Proportions
-```{r}
+# Tournament Outcome Proportions
+```{r fig.width=7,fig.height=5}
 df3<-read.csv("Data/OutcomeProportions.csv")
 colnames(df3)[1]<-"Outcome"
 
@@ -175,16 +175,17 @@ plot3<-ggplot(df3,aes(x=Year,y=Percent,fill=Outcome))+
           axis.text.y = element_text(size=12,color="black"),
           axis.title.y = element_blank(),
           axis.title.x = element_blank(),
-          plot.title = element_text(hjust = .5,size=16,color="black"),
+          plot.title = element_text(hjust = .5,size=18,color="black",vjust=4),
           axis.line.x = element_line(size=.4),
           axis.line.y = element_line(size=.4),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(),
-          legend.key.width=unit(2,"cm"),
-          panel.border = element_rect(colour = "black", fill=NA, size=1.5))+
+          legend.key.width=unit(1.5,"cm"),
+          panel.border = element_rect(colour = "black", fill=NA, size=1.5),
+        plot.margin = unit(c(1,1,1,1), "cm"))+
   guides(fill = guide_legend(reverse = TRUE));plot3
 
-ggsave("FullPlots/Fig3Outcomes.tiff", width=7,height=5,dpi=300)
+ggsave("FullPlots/TournamentOutcomes.tiff", width=7,height=5,dpi=300)
 ```
 
 # Fig5: Student Reach
@@ -277,8 +278,7 @@ patchedfig5
 ggsave("FullPlots/Fig1Citations.tiff", width=15,height=7,dpi=300)
 ```
 
-# Fig 6 LibGuide Traffic
-## Bracket Drop = Day 0
+# LibGuide Traffic
 ```{r}
 library(gridExtra);library(grid)
 
@@ -318,7 +318,7 @@ plot6<-ggplot(data=df6,aes(x=Day,y=Pageviews,group=Year,color=Year))+
            label="Tournament")+
   theme(legend.position = "bottom",
         legend.text = element_text(size=13),
-        plot.title = element_text(hjust = 0.5,size=16,vjust=3),
+        plot.title = element_text(hjust = 0.5,size=16,vjust=4),
         legend.title = element_blank(),
         axis.text = element_text(size=11),
         axis.ticks = element_line(size = 1),
@@ -333,7 +333,7 @@ plot6<-ggplot(data=df6,aes(x=Day,y=Pageviews,group=Year,color=Year))+
 ggsave("FullPlots/LibGuideTraffic.tiff", dpi=300)
 ```
 
-# Fig7: Twitter Engagements
+# Online Engagements
 ```{r}
 df7A<-read.csv("Data/TwitterEngagements.csv")
 colnames(df7A)[1]<-"Year"
