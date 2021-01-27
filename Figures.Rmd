@@ -96,7 +96,7 @@ ggsave("FullPlots/Fig1Citations.tiff", width=15,height=7,dpi=300)
 ```
 
 # Fig2: Species Representation
-```{r fig.height=8}
+```{r fig.height=8, fig.width=13}
 fig2colors<-read.csv("Data/SpeciesRep.csv") %>% select(Class,HexCode)
 
 df2<-read.csv("Data/SpeciesRep.csv") %>% 
@@ -128,7 +128,7 @@ fig2colors$HexCode<-factor(as.character(fig2colors$HexCode),levels=as.character(
 mycols<-as.character(rev(fig2colors$HexCode))
 
 plot2<-ggplot(df2,aes(x=Category,y=Represented,fill=Class))+
-    geom_bar(stat="identity",color="black",width=.60)+
+    geom_bar(stat="identity",color="black",width=.5)+
     scale_fill_manual(name="Class",values=mycols)+
     scale_y_continuous(expand = c(0,0),labels = scales::percent)+
     scale_x_discrete(labels = function(Category) str_wrap(Category, width = 20))+
@@ -148,7 +148,8 @@ plot2<-ggplot(df2,aes(x=Category,y=Represented,fill=Class))+
         plot.margin = unit(c(1,1,1,1), "cm"))+
   guides(fill=guide_legend(ncol=1));plot2
 
-ggsave("FullPlots/MammalClassRepresentation_large.tiff", height=10,dpi=300)
+ggsave("FullPlots/MammalClassRepresentation_large.tiff", height=10,width=13,dpi=300)
+ggsave("FullPlots/MammalClassRepresentation_large.png", height=10,width=13,dpi=300)
 ```
 
 # Tournament Outcome Proportions
